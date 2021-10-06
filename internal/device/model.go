@@ -1,4 +1,4 @@
-package core
+package device
 
 type Device struct {
 	Id        string `json:"id"`

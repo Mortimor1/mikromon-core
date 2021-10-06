@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	core "github.com/Mortimor1/mikromon-core"
+	"github.com/Mortimor1/mikromon-core/internal/core"
 	"github.com/gookit/config"
 	"github.com/gookit/config/yaml"
 	"log"
@@ -11,6 +11,7 @@ import (
 func main() {
 	loadConfig()
 	server := new(core.Server)
+
 	if err := server.Run("8080"); err != nil {
 		log.Fatalf("error running http server: %s", err.Error())
 	}

@@ -1,4 +1,4 @@
-package core
+package group
 
 type Group struct {
 	Id    string `json:"id"`
