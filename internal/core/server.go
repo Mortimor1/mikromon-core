@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"github.com/Mortimor1/mikromon-core/internal/device"
 	"github.com/Mortimor1/mikromon-core/internal/group"
 	"github.com/gorilla/mux"
 	"log"
@@ -18,9 +19,11 @@ func (s *Server) Run(port string) error {
 	router := mux.NewRouter()
 
 	groupHandler := group.NewGroupHandler()
+	deviceHandler := device.NewDeviceHandler()
 
-	log.Println("register group handler")
+	log.Println("register handlers")
 	groupHandler.Register(router)
+	deviceHandler.Register(router)
 
 	s.httpServer = &http.Server{
 		Addr:           ":" + port,
