@@ -3,7 +3,6 @@ module github.com/Mortimor1/mikromon-core
 go 1.17
 
 require (
-	github.com/gookit/config v1.1.0
 	github.com/gorilla/mux v1.8.0
 	github.com/sirupsen/logrus v1.8.1
 )
