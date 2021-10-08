@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/Mortimor1/mikromon-core/internal/device"
 	"github.com/Mortimor1/mikromon-core/internal/group"
+	"github.com/Mortimor1/mikromon-core/pkg/logging"
 	"github.com/gorilla/mux"
-	"log"
 	"net/http"
 	"time"
 )
@@ -15,13 +15,15 @@ type Server struct {
 }
 
 func (s *Server) Run(port string) error {
-	log.Println("create new router")
+	logger := logging.GetLogger()
+
+	logger.Info("create new router")
 	router := mux.NewRouter()
 
-	groupHandler := group.NewGroupHandler()
-	deviceHandler := device.NewDeviceHandler()
+	groupHandler := group.NewGroupHandler(logger)
+	deviceHandler := device.NewDeviceHandler(logger)
 
-	log.Println("register handlers")
+	logger.Info("register handlers")
 	groupHandler.Register(router)
 	deviceHandler.Register(router)
 
@@ -33,7 +35,7 @@ func (s *Server) Run(port string) error {
 		WriteTimeout:   10 * time.Second,
 	}
 
-	log.Printf("server listening on port %s", port)
+	logger.Infof("server listening on port %s", port)
 	return s.httpServer.ListenAndServe()
 }
 

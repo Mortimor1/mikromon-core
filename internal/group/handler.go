@@ -2,15 +2,19 @@ package group
 
 import (
 	"github.com/Mortimor1/mikromon-core/internal/handlers"
+	"github.com/Mortimor1/mikromon-core/pkg/logging"
 	"github.com/gorilla/mux"
 	"net/http"
 )
 
 type handler struct {
+	logger logging.Logger
 }
 
-func NewGroupHandler() handlers.Handler {
-	return &handler{}
+func NewGroupHandler(logger logging.Logger) handlers.Handler {
+	return &handler{
+		logger: logger,
+	}
 }
 
 func (h *handler) Register(router *mux.Router) {
