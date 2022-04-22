@@ -1,6 +1,7 @@
 package group
 
 import (
+	"encoding/json"
 	"github.com/Mortimor1/mikromon-core/internal/handlers"
 	"github.com/Mortimor1/mikromon-core/pkg/logging"
 	"github.com/gorilla/mux"
@@ -26,32 +27,22 @@ func (h *handler) Register(router *mux.Router) {
 }
 
 func (h *handler) GetGroups(writer http.ResponseWriter, request *http.Request) {
-	writer.Header().Set("Access-Control-Allow-Origin", "*")
-	writer.Header().Set("Content-Type", "application/json")
-	writer.Write([]byte("GetGroups"))
+	json.NewEncoder(writer).Encode(map[string]string{"handler": "not implemented !"})
 }
 
 func (h *handler) GetGroupById(writer http.ResponseWriter, request *http.Request) {
-	writer.Header().Set("Access-Control-Allow-Origin", "*")
-	writer.Header().Set("Content-Type", "application/json")
-	writer.Write([]byte("GetGroupById"))
+	writer.Write([]byte("not implemented !"))
 }
 
 func (h *handler) CreateGroup(writer http.ResponseWriter, request *http.Request) {
-	writer.Header().Set("Access-Control-Allow-Origin", "*")
-	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusCreated)
-	writer.Write([]byte("CreateGroup"))
+	writer.Write([]byte("not implemented !"))
 }
 
 func (h *handler) UpdateGroup(writer http.ResponseWriter, request *http.Request) {
-	writer.Header().Set("Access-Control-Allow-Origin", "*")
-	writer.Header().Set("Content-Type", "application/json")
-	writer.Write([]byte("UpdateGroup"))
+	writer.Write([]byte("not implemented !"))
 }
 
 func (h *handler) DeleteGroup(writer http.ResponseWriter, request *http.Request) {
-	writer.Header().Set("Access-Control-Allow-Origin", "*")
-	writer.Header().Set("Content-Type", "application/json")
-	writer.Write([]byte("DeleteGroup"))
+	writer.Write([]byte("not implemented !"))
 }

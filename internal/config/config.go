@@ -7,7 +7,7 @@ import (
 )
 
 type Config struct {
-	Debug *bool `yaml:"debug"`
+	Debug bool `yaml:"debug"`
 	Http  struct {
 		BindIp string `yaml:"bind_ip"`
 		Port   string `yaml:"port"`

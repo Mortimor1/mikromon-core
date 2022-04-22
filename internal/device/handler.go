@@ -26,32 +26,22 @@ func (h *handler) Register(router *mux.Router) {
 }
 
 func (h *handler) GetDevices(writer http.ResponseWriter, request *http.Request) {
-	writer.Header().Set("Access-Control-Allow-Origin", "*")
-	writer.Header().Set("Content-Type", "application/json")
-	writer.Write([]byte("GetDevices"))
+	writer.Write([]byte("not implemented !"))
 }
 
 func (h *handler) GetDeviceById(writer http.ResponseWriter, request *http.Request) {
-	writer.Header().Set("Access-Control-Allow-Origin", "*")
-	writer.Header().Set("Content-Type", "application/json")
-	writer.Write([]byte("GetDeviceById"))
+	writer.Write([]byte("not implemented !"))
 }
 
 func (h *handler) CreateDevice(writer http.ResponseWriter, request *http.Request) {
-	writer.Header().Set("Access-Control-Allow-Origin", "*")
-	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusCreated)
-	writer.Write([]byte("CreateDevice"))
+	writer.Write([]byte("not implemented !"))
 }
 
 func (h *handler) UpdateDevice(writer http.ResponseWriter, request *http.Request) {
-	writer.Header().Set("Access-Control-Allow-Origin", "*")
-	writer.Header().Set("Content-Type", "application/json")
-	writer.Write([]byte("UpdateDevice"))
+	writer.Write([]byte("not implemented !"))
 }
 
 func (h *handler) DeleteDevice(writer http.ResponseWriter, request *http.Request) {
-	writer.Header().Set("Access-Control-Allow-Origin", "*")
-	writer.Header().Set("Content-Type", "application/json")
-	writer.Write([]byte("DeleteDevice"))
+	writer.Write([]byte("not implemented !"))
 }

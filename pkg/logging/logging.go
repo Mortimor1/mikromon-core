@@ -12,9 +12,11 @@ func init() {
 		CallerPrettyfier: func(frame *runtime.Frame) (function string, file string) {
 			return "", ""
 		},
-		DisableColors: false,
+		DisableColors: true,
 		FullTimestamp: true,
 	}
+
+	l.SetLevel(logrus.DebugLevel)
 
 	e = logrus.NewEntry(l)
 }
@@ -29,6 +31,6 @@ func GetLogger() *Logger {
 	return &Logger{e}
 }
 
-func (l Logger) GetLoggerWithField(k string, v interface{}) *Logger {
+func (l *Logger) GetLoggerWithField(k string, v interface{}) *Logger {
 	return &Logger{l.WithField(k, v)}
 }

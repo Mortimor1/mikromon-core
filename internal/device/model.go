@@ -1,10 +1,10 @@
 package device
 
 type Device struct {
-	Id        string `json:"id"`
-	IpAddress string `json:"ipaddress"`
-	Name      string `json:"name"`
-	State     bool   `json:"state"`
-	Status    string `json:"status"`
-	Group     string `json:"group"` //id group
+	Id        string `json:"id" bson:"_id,omitempty"`
+	IpAddress string `json:"ipaddress" bson:"ipaddress,omitempty"`
+	Name      string `json:"name" bson:"name,omitempty"`
+	State     bool   `json:"state" bson:"state,omitempty"`
+	Status    string `json:"status" bson:"status,omitempty"`
+	Group     string `json:"group" bson:"group,omitempty"` //id group
 }
