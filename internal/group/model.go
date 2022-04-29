@@ -1,8 +1,8 @@
 package group
 
 type Group struct {
-	Id    string `json:"id"`
-	Name  string `json:"name"`
-	State bool   `json:"state"`
-	Group string `json:"group"` //id group
+	Id    string `json:"id" bson:"_id,omitempty"`
+	Name  string `json:"name" bson:"name,omitempty"`
+	State bool   `json:"state" bson:"state,omitempty"`
+	Group string `json:"group" bson:"group,omitempty"` //id group
 }

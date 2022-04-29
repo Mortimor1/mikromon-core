@@ -1,19 +1,18 @@
-package db
+package group
 
 import (
 	"context"
 	"fmt"
-	"github.com/Mortimor1/mikromon-core/internal/group"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type repository struct {
-	collection mongo.Collection
+type groupRepository struct {
+	collection *mongo.Collection
 }
 
-func (r *repository) Create(ctx context.Context, group *group.Group) (string, error) {
+func (r *groupRepository) Create(ctx context.Context, group *Group) (string, error) {
 	result, err := r.collection.InsertOne(ctx, group)
 	if err != nil {
 		return "", err
@@ -22,8 +21,8 @@ func (r *repository) Create(ctx context.Context, group *group.Group) (string, er
 	return oid.Hex(), nil
 }
 
-func (r *repository) FindAll(ctx context.Context) ([]group.Group, error) {
-	var g []group.Group
+func (r *groupRepository) FindAll(ctx context.Context) ([]Group, error) {
+	var g []Group
 
 	cur, err := r.collection.Find(ctx, bson.D{{}})
 	if err != nil {
@@ -39,10 +38,14 @@ func (r *repository) FindAll(ctx context.Context) ([]group.Group, error) {
 		return g, err
 	}
 
+	if len(g) == 0 {
+		g = make([]Group, 0)
+	}
+
 	return g, nil
 }
 
-func (r *repository) FindOne(ctx context.Context, id string) (g group.Group, err error) {
+func (r *groupRepository) FindOne(ctx context.Context, id string) (g Group, err error) {
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return g, err
@@ -58,18 +61,27 @@ func (r *repository) FindOne(ctx context.Context, id string) (g group.Group, err
 	return g, nil
 }
 
-func (r *repository) Update(ctx context.Context, group *group.Group) error {
+func (r *groupRepository) Update(ctx context.Context, group *Group) error {
 	oid, err := primitive.ObjectIDFromHex(group.Id)
 	if err != nil {
 		return err
 	}
 
-	bsonGroup, err := bson.Marshal(group)
+	filter := bson.M{"_id": oid}
+
+	groupBytes, _ := bson.Marshal(group)
+	var updateGroup bson.M
+	err = bson.Unmarshal(groupBytes, &updateGroup)
 	if err != nil {
 		return err
 	}
+	delete(updateGroup, "_id")
 
-	result, err := r.collection.UpdateByID(ctx, oid, bsonGroup)
+	update := bson.M{
+		"$set": updateGroup,
+	}
+
+	result, err := r.collection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return err
 	}
@@ -80,7 +92,7 @@ func (r *repository) Update(ctx context.Context, group *group.Group) error {
 	return nil
 }
 
-func (r *repository) Delete(ctx context.Context, id string) error {
+func (r *groupRepository) Delete(ctx context.Context, id string) error {
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return err
@@ -99,8 +111,8 @@ func (r *repository) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func NewRepository(collection mongo.Collection) *repository {
-	return &repository{
+func NewGroupRepository(collection *mongo.Collection) *groupRepository {
+	return &groupRepository{
 		collection: collection,
 	}
 }

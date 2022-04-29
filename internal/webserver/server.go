@@ -1,11 +1,11 @@
-package core
+package webserver
 
 import (
 	"context"
 	"github.com/Mortimor1/mikromon-core/internal/config"
 	"github.com/Mortimor1/mikromon-core/internal/device"
 	"github.com/Mortimor1/mikromon-core/internal/group"
-	"github.com/Mortimor1/mikromon-core/internal/handlers"
+	"github.com/Mortimor1/mikromon-core/internal/webserver/handlers"
 	"github.com/Mortimor1/mikromon-core/pkg/client/mongodb"
 	"github.com/Mortimor1/mikromon-core/pkg/logging"
 	"github.com/gorilla/mux"
@@ -24,24 +24,27 @@ func (s *Server) Run(cfg *config.Config) error {
 	logger := logging.GetLogger()
 
 	// Init DB
+	logger.Info("Connect to database")
 	client, err := mongodb.NewClient(context.TODO(),
-		"mongodb://mikromon:213WJN8gQ12@10.10.0.10:27017/?authMechanism=DEFAULT",
+		"mongodb://mikromon:213WJN8gQ12@10.10.0.10:27017",
 		"mikromon")
 	if err != nil {
 		logger.Fatal(err)
 	}
-	s.client = client
+
+	groupRepo := group.NewGroupRepository(client.Collection("group"))
+	deviceRepo := device.NewDeviceRepository(client.Collection("device"))
 
 	// Init http router
-	logger.Info("create new router")
+	logger.Info("Create new router")
 	router := mux.NewRouter()
 	router.Use(handlers.Middleware)
 	router.Use(handlers.LoggingMiddleware)
 
-	groupHandler := group.NewGroupHandler(logger)
-	deviceHandler := device.NewDeviceHandler(logger)
+	groupHandler := group.NewGroupHandler(logger, groupRepo)
+	deviceHandler := device.NewDeviceHandler(logger, deviceRepo)
 
-	logger.Info("register handlers")
+	logger.Info("Register handlers")
 	groupHandler.Register(router)
 	deviceHandler.Register(router)
 
@@ -54,7 +57,7 @@ func (s *Server) Run(cfg *config.Config) error {
 	}
 
 	// Start http server
-	logger.Infof("server listening on %s:%s", cfg.Http.BindIp, cfg.Http.Port)
+	logger.Infof("Server listening on %s:%s", cfg.Http.BindIp, cfg.Http.Port)
 	return s.httpServer.ListenAndServe()
 }
 
