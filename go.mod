@@ -11,5 +11,6 @@ require (
 require (
 	github.com/BurntSushi/toml v1.1.0 // indirect
 	github.com/joho/godotenv v1.4.0 // indirect
-	go.mongodb.org/mongo-driver v1.9.0 // indirect
+	github.com/prometheus/client_golang v1.12.2
+	go.mongodb.org/mongo-driver v1.9.0
 )

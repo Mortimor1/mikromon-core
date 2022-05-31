@@ -24,7 +24,8 @@ func NewDeviceHandler(logger *logging.Logger, r *deviceRepository) handlers.Hand
 func (h *handler) Register(router *mux.Router) {
 	router.HandleFunc("/devices", h.GetDevices).Methods("GET")
 	router.HandleFunc("/devices/{id}", h.GetDeviceById).Methods("GET")
-	router.HandleFunc("/devices/{id}", h.CreateDevice).Methods("POST")
+	router.HandleFunc("/devices/{ip}", h.GetDeviceByIp).Methods("GET")
+	router.HandleFunc("/devices", h.CreateDevice).Methods("POST")
 	router.HandleFunc("/devices/{id}", h.UpdateDevice).Methods("PUT")
 	router.HandleFunc("/devices/{id}", h.DeleteDevice).Methods("DELETE")
 }
@@ -39,7 +40,19 @@ func (h *handler) GetDevices(writer http.ResponseWriter, _ *http.Request) {
 
 func (h *handler) GetDeviceById(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
-	d, err := h.r.FindOne(context.Background(), vars["id"])
+	d, err := h.r.FindOne(context.Background(), "_id", vars["id"])
+
+	if err != nil {
+		writer.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(writer).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+	json.NewEncoder(writer).Encode(d)
+}
+
+func (h *handler) GetDeviceByIp(writer http.ResponseWriter, request *http.Request) {
+	vars := mux.Vars(request)
+	d, err := h.r.FindOne(context.Background(), "ipaddress", vars["ip"])
 
 	if err != nil {
 		writer.WriteHeader(http.StatusNotFound)
@@ -50,8 +63,6 @@ func (h *handler) GetDeviceById(writer http.ResponseWriter, request *http.Reques
 }
 
 func (h *handler) CreateDevice(writer http.ResponseWriter, request *http.Request) {
-	writer.WriteHeader(http.StatusCreated)
-
 	var d Device
 	decoder := json.NewDecoder(request.Body)
 	if err := decoder.Decode(&d); err != nil {
@@ -60,12 +71,24 @@ func (h *handler) CreateDevice(writer http.ResponseWriter, request *http.Request
 		return
 	}
 	defer request.Body.Close()
+
+	exist, err := h.r.FindOne(context.Background(), "ipaddress", d.IpAddress)
+
+	if exist != nil {
+		writer.WriteHeader(http.StatusConflict)
+		json.NewEncoder(writer).Encode(map[string]string{"error": "Device already exist"})
+		return
+	}
+
 	id, err := h.r.Create(context.Background(), &d)
 
 	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(writer).Encode(map[string]string{"error": err.Error()})
+		return
 	}
 
+	writer.WriteHeader(http.StatusCreated)
 	json.NewEncoder(writer).Encode(map[string]string{"id": id})
 }
 

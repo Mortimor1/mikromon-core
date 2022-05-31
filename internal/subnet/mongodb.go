@@ -1,4 +1,4 @@
-package device
+package subnet
 
 import (
 	"context"
@@ -8,12 +8,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type deviceRepository struct {
+type SubnetRepository struct {
 	collection *mongo.Collection
 }
 
-func (r *deviceRepository) Create(ctx context.Context, device *Device) (string, error) {
-	result, err := r.collection.InsertOne(ctx, device)
+func (r *SubnetRepository) Create(ctx context.Context, subnet *Subnet) (string, error) {
+	result, err := r.collection.InsertOne(ctx, subnet)
 	if err != nil {
 		return "", err
 	}
@@ -21,8 +21,8 @@ func (r *deviceRepository) Create(ctx context.Context, device *Device) (string, 
 	return oid.Hex(), nil
 }
 
-func (r *deviceRepository) FindAll(ctx context.Context) ([]Device, error) {
-	var d []Device
+func (r *SubnetRepository) FindAll(ctx context.Context) ([]Subnet, error) {
+	var d []Subnet
 
 	cur, err := r.collection.Find(ctx, bson.D{{}})
 	if err != nil {
@@ -39,25 +39,18 @@ func (r *deviceRepository) FindAll(ctx context.Context) ([]Device, error) {
 	}
 
 	if len(d) == 0 {
-		d = make([]Device, 0)
+		d = make([]Subnet, 0)
 	}
 
 	return d, nil
 }
 
-func (r *deviceRepository) FindOne(ctx context.Context, key string, value string) (d *Device, err error) {
-	var query bson.M
-
-	if key == "_id" {
-		oid, err := primitive.ObjectIDFromHex(key)
-		if err != nil {
-			return d, err
-		}
-		query = bson.M{"_id": oid}
-	} else {
-		query = bson.M{"ipaddress": value}
+func (r *SubnetRepository) FindOne(ctx context.Context, id string) (d Subnet, err error) {
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return d, err
 	}
-
+	query := bson.M{"_id": oid}
 	result := r.collection.FindOne(ctx, query)
 	if result.Err() != nil {
 		return d, result.Err()
@@ -68,15 +61,15 @@ func (r *deviceRepository) FindOne(ctx context.Context, key string, value string
 	return d, nil
 }
 
-func (r *deviceRepository) Update(ctx context.Context, device *Device) error {
-	oid, err := primitive.ObjectIDFromHex(device.Id)
+func (r *SubnetRepository) Update(ctx context.Context, subnet *Subnet) error {
+	oid, err := primitive.ObjectIDFromHex(subnet.Id)
 	if err != nil {
 		return err
 	}
 
 	filter := bson.M{"_id": oid}
 
-	deviceBytes, _ := bson.Marshal(device)
+	deviceBytes, _ := bson.Marshal(subnet)
 	var updateDevice bson.M
 	err = bson.Unmarshal(deviceBytes, &updateDevice)
 	if err != nil {
@@ -99,7 +92,7 @@ func (r *deviceRepository) Update(ctx context.Context, device *Device) error {
 	return nil
 }
 
-func (r *deviceRepository) Delete(ctx context.Context, id string) error {
+func (r *SubnetRepository) Delete(ctx context.Context, id string) error {
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return err
@@ -118,8 +111,8 @@ func (r *deviceRepository) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func NewDeviceRepository(collection *mongo.Collection) *deviceRepository {
-	return &deviceRepository{
+func NewSubnetRepository(collection *mongo.Collection) *SubnetRepository {
+	return &SubnetRepository{
 		collection: collection,
 	}
 }

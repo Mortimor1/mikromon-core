@@ -12,20 +12,35 @@ type Config struct {
 		BindIp string `yaml:"bind_ip"`
 		Port   string `yaml:"port"`
 	} `yaml:"http"`
+	Database struct {
+		Mongo struct {
+			Url string `yaml:"url"`
+		} `yaml:"mongo"`
+	} `yaml:"database"`
 }
 
 var instance *Config
 var once sync.Once
+
+var configPaths = []string{"config/core.yml", "core.yml", "/etc/mikromon/core.yml"}
 
 func GetConfig() *Config {
 	once.Do(func() {
 		logger := logging.GetLogger()
 		logger.Info("Read Config")
 		instance = &Config{}
-		if err := cleanenv.ReadConfig("config/config.yml", instance); err != nil {
-			desc, _ := cleanenv.GetDescription(instance, nil)
-			logger.Info(desc)
-			logger.Fatal(err)
+
+		var errorRead error
+		for _, path := range configPaths {
+			errorRead = cleanenv.ReadConfig(path, instance)
+			if errorRead == nil {
+				logger.Infof("Config loaded success path: %s", path)
+				break
+			}
+		}
+
+		if errorRead != nil {
+			logger.Fatal(errorRead)
 		}
 	})
 	return instance
